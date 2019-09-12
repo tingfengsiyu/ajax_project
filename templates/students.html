@@ -42,10 +42,10 @@
                     <td>{{ row.gender }}</td>
                     <td>{{ row.cs.title }}</td>
                     <td><a class="glyphicon glyphicon-remove icon"></a>
-                    <!-- 该网站定制样式 https://v3.bootcss.com/components/     -->
+                        <!-- 该网站定制样式 https://v3.bootcss.com/components/     -->
 
-                    <a class="fa fa-edit" fa="4" icon ></a></td>
-                <!-- 参考该网站定制图标  http://fontawesome.dashgame.com/-->
+                        <a class="fa fa-edit" fa="4" icon></a></td>
+                    <!-- 参考该网站定制图标  http://fontawesome.dashgame.com/-->
 
                 </tr>
             {% endfor %}
@@ -68,13 +68,13 @@
                     <div class="form-group">
                         <label for="username" class="col-sm-2 control-label">姓名</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="username" placeholder="姓名">
+                            <input type="text" class="form-control" name="username" placeholder="姓名">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="age" class="col-sm-2 control-label">年龄</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="age" placeholder="年龄">
+                            <input type="text" class="form-control" name="age" placeholder="年龄">
                         </div>
                     </div>
                     <!--引入radio https://v3.bootcss.com/css/#forms -->
@@ -93,10 +93,10 @@
                         <label for="class" class="col-sm-2 control-label">班级</label>
                         <div class="col-sm-10">
                             <!--引入选择列表  https://v3.bootcss.com/css/#forms -->
-                            <select class="form-control" id="cls_id">
-                                {%  for row in cls_list %}
+                            <select class="form-control" name="cls_id">
+                                {% for row in cls_list %}
                                     <option value="{{ row.id }}">{{ row.title }}</option>
-                                {%  endfor %}
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
@@ -124,22 +124,58 @@
     });
 
     function bindEvent() {
-        var postData= {
-            'username':username,
-
-        }
         $('#addButton').click(function () {
             $('#addModal').modal('show');
         })
     }
+
     function bindSave() {
+
         $('#btnSave').click(function () {
+            var postData={}
             $('#addModal').find('input,select').each(function () {
-                console.log($(this)[0]);
+                //console.log($(this)[0]);
+                //转换成dom对象
+                var v= $(this).val();
+                var n = $(this).attr('name');
+                if(n=='gender'){
+                    if($(this).prop('checked')){
+                        postData[n] = v;
+                    }
+                }else{
+                    postData[n] = v;
+                }
+
+            });
+
+                        $.ajax({
+                url:'/add_students',
+                type: 'POST',
+                data: postData,
+                success:function(arg){
+                    // arg是字符串
+                    // JSON.parse将字符串转换成字典， json.loads
+                     var dict = JSON.parse(arg);
+                    if(dict.status){
+                        /*
+                        postData = {
+                             username: 'asdf',
+                             age:18,
+                             gender: 1,
+                             cls_id: 2
+                        }
+                        自增id  = dict.data
+                         */
+                        //createRow(postData,dict.data);
+                        //$('#addModal').modal('hide');
+                         window.location.reload();
+                    }else {
+                        $('#errorMsg').text(dict.message);
+                    }
+                }
             })
-            //console.log($('this')[0]);
-            //转换成dom对象
-        })
+
+        });
     }
 </script>
 </body>

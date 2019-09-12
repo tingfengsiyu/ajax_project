@@ -19,5 +19,6 @@ from django.conf.urls import  url
 from app01 import views
 urlpatterns = [
     path('admin/', admin.site.urls),
-    url(r'^students.html$',views.students),
+    url(r'^students$',views.students),
+    url(r'^add_students$',views.add_students),
 ]
