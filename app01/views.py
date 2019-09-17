@@ -23,6 +23,7 @@ def add_students(request):
             cs_id=c
         )
         response['data'] = obj.id
+        #对象id
     except Exception as e:
         response['status'] = False
         response['message'] = '用户输入错误'
@@ -30,3 +31,11 @@ def add_students(request):
     result = json.dumps(response,ensure_ascii=False)
     return HttpResponse(result)
 
+def del_student(request):
+    ret = {'status':True}
+    try:
+        nid = request.GET.get('nid')
+        models.Student.objects.filter(id=nid).delete()
+    except Exception as e:
+        ret['status'] = False
+    return HttpResponse(json.dumps(ret))

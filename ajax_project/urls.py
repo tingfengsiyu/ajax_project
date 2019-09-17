@@ -21,4 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     url(r'^students$',views.students),
     url(r'^add_students$',views.add_students),
+    url(r'^del_student/',views.del_student),
 ]
