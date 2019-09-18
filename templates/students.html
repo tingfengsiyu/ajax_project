@@ -36,15 +36,15 @@
             <tbody id="tb">
             {% for row in stu_list %}
                 <tr nid="{{ row.id }}">
-                    <td>{{ row.id }}</td>
-                    <td>{{ row.username }}</td>
-                    <td>{{ row.age }}</td>
-                    <td>{{ row.gender }}</td>
-                    <td>{{ row.cs.title }}</td>
+                    <td na="nid">{{ row.id }}</td>
+                    <td na="user">{{ row.username }}</td>
+                    <td na="age">{{ row.age }}</td>
+                    <td na="gender">{{ row.gender }}</td>
+                    <td na="cls_id">{{ row.cs.title }}</td>
                     <td><a class="glyphicon glyphicon-remove icon del-row"></a>
                         <!-- 该网站定制样式 https://v3.bootcss.com/components/     -->
 
-                        <a class="fa fa-edit"  icon edit-row></a></td>
+                        <a class="fa fa-edit  icon edit-row"></a></td>
                     <!-- 参考该网站定制图标  http://fontawesome.dashgame.com/-->
 
                 </tr>
@@ -139,11 +139,12 @@
             </div>
             <div class="modal-body">
                 <!-- 引入水平排列表单 https://v3.bootcss.com/css/#forms -->
-                <form class="form-horizontal">
+                <form id="fm" class="form-horizontal">
+                    <input type="text" name="nid" style="display: none;"/>
                     <div class="form-group">
                         <label for="username" class="col-sm-2 control-label">姓名</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" name="username" placeholder="姓名">
+                            <input type="text" class="form-control" name="user" placeholder="姓名">
                         </div>
                     </div>
                     <div class="form-group">
@@ -180,10 +181,22 @@
             <div class="modal-footer">
                 <span id="errorMsg" style="color: #b92c28"></span>
                 <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                <button type="button" class="btn btn-primary" id="btnSave">保存</button>
+                <button type="button" class="btn btn-primary" id="btnEditSave">保存</button>
             </div>
         </div>
     </div>
+</div>
+
+<div>
+    <!--做多选时需要用到-->
+    <select id="sel" multiple>
+        <option value="1">上海</option>
+        <option value="12">北京</option>
+        <option value="11">广州</option>
+        <option value="111">沙河</option>
+    </select>
+
+    <input type="button" value="提价" id="testAjaxList" />
 </div>
 
 <script src="/static/js/jquery-3.4.1.js"></script>
@@ -195,14 +208,80 @@
         bindDel();
         bindDelConfirm();
         bindEdit();
+        bindEditConfirm();
+        bindTestAjaxList();
     });
+    /*测试传入字典*/
+    function bindTestAjaxList() {
+        $('#testAjaxList').click(function () {
+            var values= $('#sel').val();
+            $.ajax({
+                url:'/test_ajax_list/',
+                type:'POST',
+                data:{'k2':'root','k3':123},
+                traditional:true,
+                success:function (arg) {
+                    console.log(arg);
+                }
+            })
+        })
+    }
     /*绑定编辑按钮点击事件*/
     function bindEdit() {
         $('#tb').on('click','.edit-row',function () {
-            alert('1111')
            $('#editModal').modal('show');
-           console.log(2);
-           //获取当前行的所有数据，并映射到对话框的相应位置
+           //获取当前行的所有数据，并将数据映射到对话框的相应位置
+            $(this).parent().prevAll().each(function () {
+                //cls_id
+                var v=$(this).text();
+                var n = $(this).attr('na');
+                if(n=='cls_id'){
+                    var cid=$(this).attr('cid');
+                    $('#editModal select[name="cls_id"]').val(cid);
+
+                }else if(n=='gender'){
+                    //v=True
+                    if(v=='True'){
+                        $('#editModal :radio[value="1"]').prop('checked',true);
+                    }else{
+                        $('#editModal :radio[value="0"]').prop('checked',true);
+                    }
+                }else{
+                    //n=age
+                    //v=12
+                    $("#editModal input[name='"+n+"']").val(v);
+                }
+            });
+        })
+    }
+    /* 编辑提交事件*/
+    function bindEditConfirm() {
+        $('#btnEditSave').click(function () {
+            var postData={};
+            $('#editModal').find('input,select').each(function () {
+                var v=$(this).val();
+                var n =$(this).attr('name');
+                if(n=='gender'){
+                    if($(this).prop('checked')){
+                        postData[n] =v;
+                    }
+                }else{
+                    postData[n]=v;
+                }
+            });
+            $.ajax({
+                url:'/edit_student/',
+                type: 'POST',
+                data: postData,
+                dataType: 'JSON', //字典
+                success:function (arg) {
+                    if(arg.code == 1000){
+                        window.location.reload();
+                    }else{
+                        alert(arg.message);
+                    }
+                }
+            })
         })
     }
     function bindDelConfirm() {
@@ -320,7 +399,7 @@
         tdClass.innerHTML = text;
         $(tr).append(tdClass);
 
-        var tdHandle = '<td><a class="glyphicon glyphicon-remove icon del-row"></a><a class="fa fa-edit" fa="4" icon edit-row></a></td>'
+        var tdHandle = '<td><a class="glyphicon glyphicon-remove icon del-row"></a><a class="fa fa-edit icon edit-row"></a></td>'
         $(tr).append(tdHandle);
 
 

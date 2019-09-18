@@ -22,4 +22,6 @@ urlpatterns = [
     url(r'^students$',views.students),
     url(r'^add_students$',views.add_students),
     url(r'^del_student/',views.del_student),
+    url(r'^edit_student/',views.edit_student),
+    url(r'^test_ajax_list/',views.test_ajax_list)
 ]
