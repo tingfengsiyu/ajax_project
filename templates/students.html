@@ -44,7 +44,7 @@
                     <td><a class="glyphicon glyphicon-remove icon del-row"></a>
                         <!-- 该网站定制样式 https://v3.bootcss.com/components/     -->
 
-                        <a class="fa fa-edit" fa="4" icon></a></td>
+                        <a class="fa fa-edit"  icon edit-row></a></td>
                     <!-- 参考该网站定制图标  http://fontawesome.dashgame.com/-->
 
                 </tr>
@@ -55,7 +55,7 @@
 </div>
 <!--   引入模态框  https://v3.bootcss.com/javascript/#modals  -->
 <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
-    <div class="alert alert-danger" role="alert">...</div>
+   <!-- <div class="alert alert-danger" role="alert">...</div>-->
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -113,7 +113,7 @@
 </div>
 
 
-<!-- Modal -->
+<!-- 删除Modal -->
 <div class="modal fade" id="delModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog" role="document">
         <div class="alert alert-danger" role="alert">
@@ -127,6 +127,65 @@
     </div>
 </div>
 
+<!-- 编辑学生信息 -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
+   <!-- <div class="alert alert-danger" role="alert">...</div>-->
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="gridSystemModalLabel">编辑学生</h4>
+            </div>
+            <div class="modal-body">
+                <!-- 引入水平排列表单 https://v3.bootcss.com/css/#forms -->
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="username" class="col-sm-2 control-label">姓名</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="username" placeholder="姓名">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="age" class="col-sm-2 control-label">年龄</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" name="age" placeholder="年龄">
+                        </div>
+                    </div>
+                    <!--引入radio https://v3.bootcss.com/css/#forms -->
+                    <div class="form-group">
+                        <label for="gender" class="col-sm-2 control-label">性别</label>
+                        <div class="col-sm-10">
+                            <label class="radio-inline">
+                                <input type="radio" name="gender" id="gender" value="1"> 男
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="gender" id="gender" value="0">女
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="class" class="col-sm-2 control-label">班级</label>
+                        <div class="col-sm-10">
+                            <!--引入选择列表  https://v3.bootcss.com/css/#forms -->
+                            <select class="form-control" name="cls_id">
+                                {% for row in cls_list %}
+                                    <option value="{{ row.id }}">{{ row.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <span id="errorMsg" style="color: #b92c28"></span>
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-primary" id="btnSave">保存</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="/static/js/jquery-3.4.1.js"></script>
 <script src="/static/plugins/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
 <script>
@@ -135,7 +194,17 @@
         bindSave();
         bindDel();
         bindDelConfirm();
+        bindEdit();
     });
+    /*绑定编辑按钮点击事件*/
+    function bindEdit() {
+        $('#tb').on('click','.edit-row',function () {
+            alert('1111')
+           $('#editModal').modal('show');
+           console.log(2);
+           //获取当前行的所有数据，并映射到对话框的相应位置
+        })
+    }
     function bindDelConfirm() {
         $('#delConfirm').click(function () {
             var rowId= $('#delNid').val();
@@ -155,7 +224,9 @@
         })
     }
     function bindDel() {
-        $('.del-row').click(function () {
+        //$('.del-row').click(function () {
+         $('#tb').on('click','.del-row',function () {
+            //事件委托，3里面，只能找外部选择器$('要绑定的上级标签')，不能找自己，因为他自己还没生成出来；要找上一级，绑定委托，指定tb标签，当发生click事件时，绑定del-row属性
             $('#delModal').modal('show');
             //获取当前行的ID
             //设置给delNid
@@ -223,7 +294,7 @@
 
     function createRow(postData, nid) {
         var tr = document.createElement('tr');
-
+        $(tr).attr('nid',nid);
         trID = document.createElement('td');
         trID.innerHTML = nid;
         $(tr).append(trID);
@@ -249,7 +320,7 @@
         tdClass.innerHTML = text;
         $(tr).append(tdClass);
 
-        var tdHandle = '<td><a class="glyphicon glyphicon-remove icon"></a><a class="fa fa-edit" fa="4" icon></a></td>'
+        var tdHandle = '<td><a class="glyphicon glyphicon-remove icon del-row"></a><a class="fa fa-edit" fa="4" icon edit-row></a></td>'
         $(tr).append(tdHandle);
 
 
